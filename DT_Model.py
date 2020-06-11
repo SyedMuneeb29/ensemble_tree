@@ -10,7 +10,7 @@ from Utilities import *
 start_time = time.time()
 
 
-data = generateDataWithLabelAndFeaturesFromCSVWithFirstColumnAsLabel("MQ2008_CSV.csv")
+data = generateDataWithLabelAndFeaturesFromCSVWithFirstColumnAsLabel("Flight_Crashes_CSV.csv")
 trainEnsembleModelAlongWithFalseNegatives(data , tree.DecisionTreeClassifier())
 print(f"Ensemble : {ensemble_tree_model}")
 

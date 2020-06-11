@@ -1,6 +1,7 @@
 
 import csv
 import random
+from sklearn import tree
 
 ensemble_tree_model = [
 
@@ -15,7 +16,7 @@ def appendEnsembleTreeModel (model , false_negative_list) :
 def trainEnsembleModelAlongWithFalseNegatives (data , ml_model) :
 
     # separate training and testing data
-    testing , training = testAndTrainSplit(data , 0.70)
+    testing , training = testAndTrainSplit(data , 0.10)
 
     # x and y from training and testing
     X_training , Y_training = filterOutXandY(training)
@@ -31,18 +32,18 @@ def trainEnsembleModelAlongWithFalseNegatives (data , ml_model) :
         predictions = ml_model.predict(X_testing)
 
         # accuracy of the model :
-        correct , incorrect , indexListOfIncorrectInData = calculateAccuracy(X_testing , Y_testing , data , predictions)
+        correct , incorrect , incorrectXandYList = calculateAccuracy(X_testing , Y_testing , data , predictions) #indexListOfIncorrectInData
 
         printResult(ml_model , correct , incorrect)
 
         # if incorrect != 0 :
         for i in range(1) :
-            false_negative_list = []
+            false_negative_list = incorrectXandYList #[]
+            #
+            # for index in indexListOfIncorrectInData :
+            #     false_negative_list.append(data[index])
 
-            for index in indexListOfIncorrectInData :
-                false_negative_list.append(data[index])
-
-            appendEnsembleTreeModel(type(ml_model).__name__ , indexListOfIncorrectInData)
+            appendEnsembleTreeModel(type(ml_model).__name__ , false_negative_list) #indexListOfIncorrectInData)
 
             # print(false_negative_list)
             newDataForNextModel = false_negative_list
@@ -63,7 +64,7 @@ def generateDataWithLabelAndFeaturesFromCSVWithFirstColumnAsLabel (csv_filename)
         for row in reader :
             data.append({
                 "label" : [int(cell) for cell in row[0]] ,
-                "features" : [float(cell) for cell in row[0:] ]
+                "features" : [float(cell) for cell in row[1:] ]
             })
 
 
@@ -73,10 +74,10 @@ def generateDataWithLabelAndFeaturesFromCSVWithFirstColumnAsLabel (csv_filename)
 def testAndTrainSplit (data , ratio) :
     # Separate data into training and testing groups
     holdout = int(ratio * len(data))
+    print(f"holdout{holdout}")
     random.shuffle(data)
-    testing = data[:holdout]
-    training = data[holdout:]
-
+    training = data[:holdout]
+    testing = data[holdout:]
     return testing , training
 
 
@@ -123,7 +124,7 @@ def calculateAccuracy (X_testing , Y_testing , data , predictions) :
     indexListOfIncorrectItemsInData = list(set(indexListOfIncorrectItemsInData))
 
 
-    return correct , incorrect , indexListOfIncorrectItemsInData
+    return correct , incorrect , incorrectXandYList #indexListOfIncorrectItemsInData
 
 def printResult (model , correct , incorrect ) :
     print(f"Result for model1 {type(model).__name__}")
