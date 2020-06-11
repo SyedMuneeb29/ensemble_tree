@@ -2,10 +2,12 @@ import csv
 import random
 import numpy as np
 
+import time
 
 from sklearn import tree
 from Utilities import *
 
+start_time = time.time()
 
 
 data = generateDataWithLabelAndFeaturesFromCSVWithFirstColumnAsLabel("MQ2008_CSV.csv")
@@ -13,6 +15,9 @@ trainEnsembleModelAlongWithFalseNegatives(data , tree.DecisionTreeClassifier())
 print(f"Ensemble : {ensemble_tree_model}")
 
 
+end_time = time.time()
+
+print(f"Exeuction Time : {end_time - start_time}")
 
 
 
