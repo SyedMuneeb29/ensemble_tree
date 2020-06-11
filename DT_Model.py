@@ -1,17 +1,12 @@
 import csv
 import random
+import numpy as np
+
 
 from sklearn import tree
 from Utilities import *
 
-#{
-#     "model1" : model ,
-#     "false_negative_list_1" : []
-# } ,
-# {
-#     "model_2" : model ,
-#     "false_negative_list_2" : []
-# } ,
+
 ensemble_tree_model = [
 
 ]
@@ -25,37 +20,42 @@ def appendEnsembleTreeModel (model , false_negative_list) :
 def trainEnsembleModelAlongWithFalseNegatives (data , ml_model) :
 
     # separate training and testing data
-    testing , training = testAndTrainSplit(data , 0.70)
+    testing , training = testAndTrainSplit(data , 0.90)
 
     # x and y from training and testing
     X_training , Y_training = filterOutXandY(training)
     X_testing , Y_testing = filterOutXandY(testing)
 
     # train
-    ml_model.fit(X_training , Y_training)
 
-    # predict
-    predictions = ml_model.predict(X_testing)
+    try :
 
-    # accuracy of the model :
-    correct , incorrect , indexListOfIncorrectInData = calculateAccuracy(X_testing , Y_testing , data , predictions)
+        ml_model.fit(X_training , Y_training)
 
-    printResult(ml_model , correct , incorrect)
+        # predict
+        predictions = ml_model.predict(X_testing)
 
-    # if incorrect != 0 :
-    for i in range(1) :
-        false_negative_list = []
+        # accuracy of the model :
+        correct , incorrect , indexListOfIncorrectInData = calculateAccuracy(X_testing , Y_testing , data , predictions)
 
-        for index in indexListOfIncorrectInData :
-            false_negative_list.append(data[index])
+        printResult(ml_model , correct , incorrect)
 
-        appendEnsembleTreeModel(ml_model , indexListOfIncorrectInData)
+        # if incorrect != 0 :
+        for i in range(1) :
+            false_negative_list = []
 
-        newDataForNextModel = false_negative_list
-        print(newDataForNextModel)
-        # trainEnsembleModelAlongWithFalseNegatives(data , tree.DecisionTreeClassifier())
+            for index in indexListOfIncorrectInData :
+                false_negative_list.append(data[index])
 
-    # Print Result :
+            appendEnsembleTreeModel(type(ml_model).__name__ , indexListOfIncorrectInData)
+
+            # print(false_negative_list)
+            newDataForNextModel = false_negative_list
+
+            trainEnsembleModelAlongWithFalseNegatives(newDataForNextModel , tree.DecisionTreeClassifier())
+
+    except :
+        print("Model Learned")
 
 
 
@@ -67,7 +67,12 @@ model1 = tree.DecisionTreeClassifier()
 
 data = generateDataWithLabelAndFeaturesFromCSVWithFirstColumnAsLabel("MQ2008_CSV.csv")
 
+
+
 trainEnsembleModelAlongWithFalseNegatives(data , tree.DecisionTreeClassifier())
+
+
+print(f"Ensemble : {ensemble_tree_model}")
 
 # trainEnsembleModelAlongWithFalseNegatives(filterOutIncorrectRows(data) , tree.DecisionTreeClassifier())
 

@@ -25,6 +25,7 @@ def testAndTrainSplit (data , ratio) :
     random.shuffle(data)
     testing = data[:holdout]
     training = data[holdout:]
+
     return testing , training
 
 
@@ -52,6 +53,8 @@ def calculateAccuracy (X_testing , Y_testing , data , predictions) :
             indexesOfIncorrect.append(Y_testing.index(actual))
         else :
             incorrect += 1
+            indexesOfIncorrect.append(Y_testing.index(actual))
+
 
     # for incorrect indexes
     incorrectXandYList = []
@@ -66,6 +69,7 @@ def calculateAccuracy (X_testing , Y_testing , data , predictions) :
         indexListOfIncorrectItemsInData.append(data.index(incorrectItem))
 
     indexListOfIncorrectItemsInData = list(set(indexListOfIncorrectItemsInData))
+
 
     return correct , incorrect , indexListOfIncorrectItemsInData
 
