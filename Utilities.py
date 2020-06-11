@@ -2,6 +2,57 @@
 import csv
 import random
 
+ensemble_tree_model = [
+
+]
+
+def appendEnsembleTreeModel (model , false_negative_list) :
+    ensemble_tree_model.append({
+        "model"+str(len(ensemble_tree_model)) : model ,
+        "false_negative_list"+str(len(ensemble_tree_model)) : false_negative_list
+    })
+
+def trainEnsembleModelAlongWithFalseNegatives (data , ml_model) :
+
+    # separate training and testing data
+    testing , training = testAndTrainSplit(data , 0.70)
+
+    # x and y from training and testing
+    X_training , Y_training = filterOutXandY(training)
+    X_testing , Y_testing = filterOutXandY(testing)
+
+    # train
+
+    try :
+
+        ml_model.fit(X_training , Y_training)
+
+        # predict
+        predictions = ml_model.predict(X_testing)
+
+        # accuracy of the model :
+        correct , incorrect , indexListOfIncorrectInData = calculateAccuracy(X_testing , Y_testing , data , predictions)
+
+        printResult(ml_model , correct , incorrect)
+
+        # if incorrect != 0 :
+        for i in range(1) :
+            false_negative_list = []
+
+            for index in indexListOfIncorrectInData :
+                false_negative_list.append(data[index])
+
+            appendEnsembleTreeModel(type(ml_model).__name__ , indexListOfIncorrectInData)
+
+            # print(false_negative_list)
+            newDataForNextModel = false_negative_list
+
+            trainEnsembleModelAlongWithFalseNegatives(newDataForNextModel , tree.DecisionTreeClassifier())
+
+    except :
+        print("Model Learned")
+
+
 
 def generateDataWithLabelAndFeaturesFromCSVWithFirstColumnAsLabel (csv_filename) :
     with open (csv_filename) as f :
@@ -50,10 +101,11 @@ def calculateAccuracy (X_testing , Y_testing , data , predictions) :
         total += 1
         if actual == predicted :
             correct += 1
-            indexesOfIncorrect.append(Y_testing.index(actual))
+
         else :
             incorrect += 1
             indexesOfIncorrect.append(Y_testing.index(actual))
+
 
 
     # for incorrect indexes
